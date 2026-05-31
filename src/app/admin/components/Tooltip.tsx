@@ -27,9 +27,9 @@ export default function Tooltip({ text }: { text: string }) {
         ?
       </button>
       {open && (
-        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg">
+        <div className="absolute z-50 bottom-full left-0 mb-2 w-72 sm:w-80 p-3 bg-gray-900 text-white text-xs leading-relaxed rounded-lg shadow-lg">
           {text}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
+          <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
         </div>
       )}
     </div>

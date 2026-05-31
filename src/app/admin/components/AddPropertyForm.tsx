@@ -6,7 +6,7 @@ import ImageUploader from './ImageUploader'
 
 const tips = {
   title: 'El nombre del anuncio. Corto y descriptivo. Ej: "Casa en Colonia Centro"',
-  id: 'Identificador único para la URL. Se genera del título. Solo letras, números y guiones.',
+  id: 'URL SEO-friendly. Se genera automáticamente: /tipo/ciudad/colonia/título. Puedes editarla manualmente.',
   type: '¿Se vende, se renta, o ambas? Esto determina en qué sección aparece.',
   category: 'Tipo de inmueble: casa, departamento, terreno, local comercial o bodega.',
   salePrice: 'Precio en pesos mexicanos. Solo números, sin comas. Ej: 3500000',
@@ -26,15 +26,25 @@ const tips = {
   isBusinessProperty: 'Marca si es local, oficina o negocio que genera ingresos.',
 }
 
-function generateSlug(title: string): string {
-  return title
+function slugify(text: string): string {
+  return text
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
-    .slice(0, 60)
+    .replace(/^-|-$/g, '')
+}
+
+function generateId(type: string, city: string, neighborhood: string, title: string): string {
+  const typeSlug = type === 'rent' ? 'renta' : type === 'both' ? 'venta-renta' : 'venta'
+  const citySlug = slugify(city || 'tepic-nayarit')
+  const coloniaSlug = slugify(neighborhood || '')
+  const titleSlug = slugify(title || '').slice(0, 50)
+
+  const parts = [typeSlug, citySlug, coloniaSlug, titleSlug].filter(Boolean)
+  return parts.join('-')
 }
 
 interface AddPropertyFormProps {
@@ -68,9 +78,29 @@ export default function AddPropertyForm({ onPropertyCreated }: AddPropertyFormPr
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
+  function regenerateId(t?: string, tp?: string, c?: string, n?: string) {
+    if (idManual) return
+    setId(generateId(tp ?? type, c ?? city, n ?? neighborhood, t ?? title))
+  }
+
   function handleTitleChange(val: string) {
     setTitle(val)
-    if (!idManual) setId(generateSlug(val))
+    regenerateId(val)
+  }
+
+  function handleTypeChange(val: 'sale' | 'rent' | 'both') {
+    setType(val)
+    regenerateId(undefined, val)
+  }
+
+  function handleCityChange(val: string) {
+    setCity(val)
+    regenerateId(undefined, undefined, val)
+  }
+
+  function handleNeighborhoodChange(val: string) {
+    setNeighborhood(val)
+    regenerateId(undefined, undefined, undefined, val)
   }
 
   function handleIdChange(val: string) {
@@ -225,17 +255,18 @@ export default function AddPropertyForm({ onPropertyCreated }: AddPropertyFormPr
 
         <div>
           <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
-            ID (URL) <Tooltip text={tips.id} />
+            URL <Tooltip text={tips.id} />
           </label>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400">/propiedad/</span>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-gray-400 whitespace-nowrap">/propiedad/</span>
             <input
               type="text"
               value={id}
               onChange={(e) => handleIdChange(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          {id && <p className="text-[11px] text-gray-400 mt-1 font-mono truncate">goprismamx.com/propiedad/{id}</p>}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -245,7 +276,7 @@ export default function AddPropertyForm({ onPropertyCreated }: AddPropertyFormPr
             </label>
             <select
               value={type}
-              onChange={(e) => setType(e.target.value as 'sale' | 'rent' | 'both')}
+              onChange={(e) => handleTypeChange(e.target.value as 'sale' | 'rent' | 'both')}
               className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="sale">Venta</option>
@@ -283,7 +314,7 @@ export default function AddPropertyForm({ onPropertyCreated }: AddPropertyFormPr
           <input
             type="text"
             value={neighborhood}
-            onChange={(e) => setNeighborhood(e.target.value)}
+            onChange={(e) => handleNeighborhoodChange(e.target.value)}
             placeholder="Ej: Col. Centro"
             className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -309,7 +340,7 @@ export default function AddPropertyForm({ onPropertyCreated }: AddPropertyFormPr
           <input
             type="text"
             value={city}
-            onChange={(e) => setCity(e.target.value)}
+            onChange={(e) => handleCityChange(e.target.value)}
             className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
