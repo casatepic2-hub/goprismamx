@@ -4,12 +4,6 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Property, formatPrice } from '@/data/properties'
 
-interface Settings {
-  saleDeleteWeeks: number;
-  rentDeleteWeeks: number;
-  enabled: boolean;
-}
-
 interface FeaturedSettings {
   rentFeatured: string[];
   saleFeatured: string[];
@@ -18,37 +12,20 @@ interface FeaturedSettings {
 }
 
 interface SettingsPanelProps {
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   featuredSettings: FeaturedSettings;
   setFeaturedSettings: React.Dispatch<React.SetStateAction<FeaturedSettings>>;
   properties: Property[];
 }
 
 export default function SettingsPanel({
-  settings,
-  setSettings,
   featuredSettings,
   setFeaturedSettings,
   properties
 }: SettingsPanelProps) {
-  const [savingSettings, setSavingSettings] = useState(false)
   const [savingFeatured, setSavingFeatured] = useState(false)
 
   function getPropertyById(id: string) {
     return properties.find(p => p.id === id)
-  }
-
-  async function saveSettings() {
-    setSavingSettings(true)
-    try {
-      await fetch('/api/admin/settings', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings)
-      })
-    } catch (error) { console.error('Error:', error) }
-    finally { setSavingSettings(false) }
   }
 
   async function saveFeaturedSettings() {
@@ -59,7 +36,7 @@ export default function SettingsPanel({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(featuredSettings)
       })
-    } catch (error) { console.error('Error saving featured settings:', error) }
+    } catch (error) { console.error('Error:', error) }
     finally { setSavingFeatured(false) }
   }
 
@@ -80,95 +57,42 @@ export default function SettingsPanel({
         body: JSON.stringify(newSettings)
       })
     } catch (error) {
-      console.error('Error saving featured settings:', error)
+      console.error('Error:', error)
     }
   }
 
   return (
     <div className="space-y-6">
-      {/* Auto-Delete Settings */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="font-semibold text-gray-900">Auto-Delete Settings</h2>
-            <p className="text-sm text-gray-400">Automatically remove old listings after specified weeks.</p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Sale</span>
-            <input
-              type="number"
-              min="1"
-              max="52"
-              value={settings.saleDeleteWeeks}
-              onChange={(e) => setSettings({ ...settings, saleDeleteWeeks: parseInt(e.target.value) || 8 })}
-              className="w-16 px-2 py-1.5 rounded-lg border border-gray-200 text-sm text-center"
-            />
-            <span className="text-sm text-gray-400">weeks</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Rent</span>
-            <input
-              type="number"
-              min="1"
-              max="52"
-              value={settings.rentDeleteWeeks}
-              onChange={(e) => setSettings({ ...settings, rentDeleteWeeks: parseInt(e.target.value) || 3 })}
-              className="w-16 px-2 py-1.5 rounded-lg border border-gray-200 text-sm text-center"
-            />
-            <span className="text-sm text-gray-400">weeks</span>
-          </div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={settings.enabled}
-              onChange={(e) => setSettings({ ...settings, enabled: e.target.checked })}
-              className="w-4 h-4 rounded border-gray-300 text-primary-600"
-            />
-            <span className="text-sm text-gray-500">Enabled</span>
-          </label>
-          <button
-            onClick={saveSettings}
-            disabled={savingSettings}
-            className="ml-auto px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50"
-          >
-            {savingSettings ? 'Saving...' : 'Save Settings'}
-          </button>
-        </div>
-      </div>
-
       {/* Featured Properties Section */}
       <div className="bg-white rounded-2xl border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="font-semibold text-gray-900">Featured Properties</h2>
-            <p className="text-sm text-gray-400">Appear first in search and hero section. Add from Properties tab.</p>
+            <h2 className="font-semibold text-gray-900">Propiedades Destacadas</h2>
+            <p className="text-sm text-gray-400">Aparecen primero en búsqueda y en la sección principal. Agrega desde la pestaña de Propiedades.</p>
           </div>
           <button
             onClick={saveFeaturedSettings}
             disabled={savingFeatured}
-            className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 disabled:opacity-50"
+            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
-            {savingFeatured ? 'Saving...' : 'Save'}
+            {savingFeatured ? 'Guardando...' : 'Guardar'}
           </button>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
           {/* Sale Featured */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">For Sale ({featuredSettings.saleFeatured.length}/3)</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">En Venta ({featuredSettings.saleFeatured.length}/3)</h3>
             <div className="space-y-2">
               {featuredSettings.saleFeatured.length === 0 ? (
-                <p className="text-gray-400 text-sm py-4 text-center border-2 border-dashed border-gray-200 rounded-lg">No properties selected</p>
+                <p className="text-gray-400 text-sm py-4 text-center border-2 border-dashed border-gray-200 rounded-lg">Sin propiedades seleccionadas</p>
               ) : featuredSettings.saleFeatured.map((id) => {
                 const prop = getPropertyById(id)
                 return (
                   <div key={id} className="flex items-center gap-3 bg-gray-50 rounded-lg p-2">
                     <div className="w-12 h-12 relative rounded overflow-hidden flex-shrink-0">
                       {prop?.images?.[0] ? (
-                        <Image src={prop.images[0]} alt="" fill className="object-cover" />
+                        <Image src={prop.images[0]} alt="" fill className="object-cover" sizes="48px" />
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,7 +103,7 @@ export default function SettingsPanel({
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">{prop?.title || id}</p>
-                      <p className="text-xs text-gray-400">{prop?.price ? formatPrice(prop.price) : 'No price'}</p>
+                      <p className="text-xs text-gray-400">{prop?.price ? formatPrice(prop.price) : 'Sin precio'}</p>
                     </div>
                     <button
                       onClick={() => removeFromFeatured('sale', id)}
@@ -197,17 +121,17 @@ export default function SettingsPanel({
 
           {/* Rent Featured */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">For Rent ({featuredSettings.rentFeatured.length}/3)</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">En Renta ({featuredSettings.rentFeatured.length}/3)</h3>
             <div className="space-y-2">
               {featuredSettings.rentFeatured.length === 0 ? (
-                <p className="text-gray-400 text-sm py-4 text-center border-2 border-dashed border-gray-200 rounded-lg">No properties selected</p>
+                <p className="text-gray-400 text-sm py-4 text-center border-2 border-dashed border-gray-200 rounded-lg">Sin propiedades seleccionadas</p>
               ) : featuredSettings.rentFeatured.map((id) => {
                 const prop = getPropertyById(id)
                 return (
                   <div key={id} className="flex items-center gap-3 bg-gray-50 rounded-lg p-2">
                     <div className="w-12 h-12 relative rounded overflow-hidden flex-shrink-0">
                       {prop?.images?.[0] ? (
-                        <Image src={prop.images[0]} alt="" fill className="object-cover" />
+                        <Image src={prop.images[0]} alt="" fill className="object-cover" sizes="48px" />
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,7 +142,7 @@ export default function SettingsPanel({
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">{prop?.title || id}</p>
-                      <p className="text-xs text-gray-400">{prop?.rentPrice ? `${formatPrice(prop.rentPrice)}/mo` : 'No price'}</p>
+                      <p className="text-xs text-gray-400">{prop?.rentPrice ? `${formatPrice(prop.rentPrice)}/mes` : 'Sin precio'}</p>
                     </div>
                     <button
                       onClick={() => removeFromFeatured('rent', id)}
@@ -237,16 +161,16 @@ export default function SettingsPanel({
 
         {/* Featured Similar Section */}
         <div className="mt-6 pt-6 border-t border-gray-100">
-          <h3 className="text-sm font-medium text-gray-700 mb-4">Featured Similar (shown in similar properties section)</h3>
+          <h3 className="text-sm font-medium text-gray-700 mb-4">Similares Destacadas (aparecen en la sección de similares)</h3>
           <div className="grid md:grid-cols-2 gap-6">
             {/* Sale Similar */}
             <div>
-              <p className="text-xs text-gray-400 mb-2">For sale properties</p>
+              <p className="text-xs text-gray-400 mb-2">Propiedades en venta</p>
               {featuredSettings.saleFeaturedSimilar ? (
                 <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-2">
                   <div className="w-12 h-12 relative rounded overflow-hidden flex-shrink-0">
                     {getPropertyById(featuredSettings.saleFeaturedSimilar)?.images?.[0] ? (
-                      <Image src={getPropertyById(featuredSettings.saleFeaturedSimilar)!.images![0]} alt="" fill className="object-cover" />
+                      <Image src={getPropertyById(featuredSettings.saleFeaturedSimilar)!.images![0]} alt="" fill className="object-cover" sizes="48px" />
                     ) : (
                       <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,18 +192,18 @@ export default function SettingsPanel({
                   </button>
                 </div>
               ) : (
-                <p className="text-gray-400 text-sm py-3 text-center border-2 border-dashed border-gray-200 rounded-lg">Not selected</p>
+                <p className="text-gray-400 text-sm py-3 text-center border-2 border-dashed border-gray-200 rounded-lg">No seleccionada</p>
               )}
             </div>
 
             {/* Rent Similar */}
             <div>
-              <p className="text-xs text-gray-400 mb-2">For rent properties</p>
+              <p className="text-xs text-gray-400 mb-2">Propiedades en renta</p>
               {featuredSettings.rentFeaturedSimilar ? (
                 <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-2">
                   <div className="w-12 h-12 relative rounded overflow-hidden flex-shrink-0">
                     {getPropertyById(featuredSettings.rentFeaturedSimilar)?.images?.[0] ? (
-                      <Image src={getPropertyById(featuredSettings.rentFeaturedSimilar)!.images![0]} alt="" fill className="object-cover" />
+                      <Image src={getPropertyById(featuredSettings.rentFeaturedSimilar)!.images![0]} alt="" fill className="object-cover" sizes="48px" />
                     ) : (
                       <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -301,7 +225,7 @@ export default function SettingsPanel({
                   </button>
                 </div>
               ) : (
-                <p className="text-gray-400 text-sm py-3 text-center border-2 border-dashed border-gray-200 rounded-lg">Not selected</p>
+                <p className="text-gray-400 text-sm py-3 text-center border-2 border-dashed border-gray-200 rounded-lg">No seleccionada</p>
               )}
             </div>
           </div>
