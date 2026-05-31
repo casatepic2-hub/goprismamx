@@ -13,7 +13,7 @@ const tips = {
   rentPrice: 'Precio de renta por mes en pesos. Solo números. Ej: 15000',
   avaluoPrice: 'Valor del avalúo oficial. Si el precio de venta es menor, se resalta como oferta.',
   neighborhood: 'Colonia o fraccionamiento. Ej: "Col. Centro" o "Fracc. Los Sauces"',
-  location: 'Dirección o referencia. Ej: "Calle Mina 336B, entre Oaxaca y Mazatlán"',
+  location: 'Dirección de la propiedad. Se usa para ubicar en el mapa automáticamente. Ej: "Calle Mina 336B"',
   city: 'Por defecto "Tepic, Nayarit". Cambia solo si es otra ciudad.',
   bedrooms: 'Número de recámaras. Usa decimales para estudios: 2.5',
   bathrooms: 'Número de baños. Usa .5 para medio baño. Ej: 2.5 = 2 completos + 1 medio',
@@ -22,7 +22,6 @@ const tips = {
   features: 'Agrega una por una. Ej: "Cochera 2 autos", "Cocina equipada", "Calentador solar"',
   images: 'La primera foto es la imagen principal del anuncio. Puedes reordenar.',
   video: 'URL de YouTube o TikTok con video de la propiedad (opcional).',
-  coordinates: 'Lat/lng para el mapa. Clic derecho en Google Maps → "¿Qué hay aquí?" para obtenerlas.',
   isBusinessProperty: 'Marca si es local, oficina o negocio que genera ingresos.',
 }
 
@@ -62,6 +61,8 @@ export default function AddPropertyForm({ onPropertyCreated }: AddPropertyFormPr
   const [city, setCity] = useState('Tepic, Nayarit')
   const [lat, setLat] = useState('')
   const [lng, setLng] = useState('')
+  const [geocoding, setGeocoding] = useState(false)
+  const [geocodeStatus, setGeocodeStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [price, setPrice] = useState('')
   const [rentPrice, setRentPrice] = useState('')
   const [avaluoPrice, setAvaluoPrice] = useState('')
@@ -106,6 +107,47 @@ export default function AddPropertyForm({ onPropertyCreated }: AddPropertyFormPr
   function handleIdChange(val: string) {
     setIdManual(true)
     setId(val.replace(/[^a-z0-9-]/g, ''))
+  }
+
+  async function geocodeAddress() {
+    const address = location.trim()
+    if (!address) return
+
+    setGeocoding(true)
+    setGeocodeStatus('idle')
+
+    try {
+      const cityParts = city.split(',').map(s => s.trim())
+      const cityName = cityParts[0] || 'Tepic'
+      const stateName = cityParts[1] || 'Nayarit'
+
+      const params = new URLSearchParams({
+        street: address,
+        city: cityName,
+        state: stateName,
+        country: 'Mexico',
+        format: 'json',
+        limit: '1',
+      })
+
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
+        headers: { 'User-Agent': 'GoprismaMX/1.0' },
+      })
+
+      const data = await res.json()
+
+      if (data.length > 0) {
+        setLat(data[0].lat)
+        setLng(data[0].lon)
+        setGeocodeStatus('success')
+      } else {
+        setGeocodeStatus('error')
+      }
+    } catch {
+      setGeocodeStatus('error')
+    } finally {
+      setGeocoding(false)
+    }
   }
 
   function addFeature() {
@@ -345,27 +387,24 @@ export default function AddPropertyForm({ onPropertyCreated }: AddPropertyFormPr
           />
         </div>
 
-        <div>
-          <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
-            Coordenadas <Tooltip text={tips.coordinates} />
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              type="text"
-              value={lat}
-              onChange={(e) => setLat(e.target.value)}
-              placeholder="Latitud: 21.5041"
-              className="px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              type="text"
-              value={lng}
-              onChange={(e) => setLng(e.target.value)}
-              placeholder="Longitud: -104.8946"
-              className="px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+        {location.trim() && (
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={geocodeAddress}
+              disabled={geocoding}
+              className="px-4 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-100 disabled:opacity-50 transition-colors"
+            >
+              {geocoding ? 'Buscando...' : '📍 Buscar ubicación en mapa'}
+            </button>
+            {geocodeStatus === 'success' && (
+              <span className="text-xs text-green-600 font-medium">Ubicación encontrada</span>
+            )}
+            {geocodeStatus === 'error' && (
+              <span className="text-xs text-amber-600 font-medium">No se encontró. Verifica la dirección.</span>
+            )}
           </div>
-        </div>
+        )}
       </section>
 
       {/* Section 3: Precios */}
