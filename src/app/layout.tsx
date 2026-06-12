@@ -9,12 +9,12 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://goprismamx.com'),
   title: 'Prisma Real Estate | Casas, Departamentos y Terrenos en Venta y Renta',
-  description: 'Propiedades en Nayarit, Xalisco y Sinaloa. Casas, departamentos, terrenos y locales comerciales en venta y renta.',
+  description: 'Propiedades en Nayarit, Jalisco y Sinaloa. Casas, departamentos, terrenos y locales comerciales en venta y renta.',
   keywords: 'prisma real estate, casas en venta tepic, departamentos renta tepic, terrenos tepic, propiedades nayarit, bienes raices tepic, renta tepic',
   authors: [{ name: 'Prisma Real Estate' }],
   openGraph: {
     title: 'Prisma Real Estate | Propiedades en Venta y Renta',
-    description: 'Propiedades en Nayarit, Xalisco y Sinaloa. Casas, departamentos, terrenos y locales comerciales.',
+    description: 'Propiedades en Nayarit, Jalisco y Sinaloa. Casas, departamentos, terrenos y locales comerciales.',
     type: 'website',
     locale: 'es_MX',
     siteName: 'Prisma Real Estate',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Prisma Real Estate | Propiedades en Venta y Renta',
-    description: 'Propiedades en Nayarit, Xalisco y Sinaloa.',
+    description: 'Propiedades en Nayarit, Jalisco y Sinaloa.',
     images: ['/og-image.jpg'],
   },
   robots: {

@@ -388,7 +388,7 @@ function HomeContent() {
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-[1.1]">
                 Propiedades en<br />
-                <span className="text-red-600 text-3xl sm:text-4xl lg:text-5xl">Nayarit, Xalisco y Sinaloa</span>
+                <span className="text-red-600 text-3xl sm:text-4xl lg:text-5xl">Nayarit, Jalisco y Sinaloa</span>
               </h1>
 
               <p className="text-lg text-gray-600 mb-6 max-w-lg mx-auto lg:mx-0">
@@ -766,7 +766,7 @@ function HomeContent() {
                 </div>
               </div>
               <p className="text-gray-400 mb-6 max-w-md">
-                Propiedades en venta y renta en Nayarit, Xalisco y Sinaloa.
+                Propiedades en venta y renta en Nayarit, Jalisco y Sinaloa.
               </p>
               <div className="flex gap-4">
                 <a href="https://www.facebook.com/GioRomerolo" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors">
@@ -801,7 +801,7 @@ function HomeContent() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   </svg>
-                  Nayarit, Xalisco y Sinaloa
+                  Nayarit, Jalisco y Sinaloa
                 </li>
               </ul>
             </div>
