@@ -53,4 +53,6 @@ plan.md
 
 # Old property images (not used in new project)
 public/properties/
-public/images/
+public/images/*
+# ...but keep static review avatars (re-hosted from Facebook)
+!public/images/reviews/
