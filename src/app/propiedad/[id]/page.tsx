@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
 import { Property, formatPrice } from '@/data/properties'
+import { ReviewsCompact } from '@/components/ReviewsWidget'
 
 const WHATSAPP_NUMBER = '523317138888'
 
@@ -412,6 +413,9 @@ export default function PropertyDetail() {
                   </a>
                 </div>
 
+                {/* Social Proof */}
+                <ReviewsCompact />
+
                 {/* Summary Card */}
                 <div className="hidden lg:block bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 text-white">
                   <h3 className="font-bold text-xl mb-6">Resumen</h3>
@@ -503,7 +507,7 @@ export default function PropertyDetail() {
               <span className="text-[9px] sm:text-[10px] text-gray-400 tracking-wider uppercase">Real Estate</span>
             </div>
           </Link>
-          <p className="text-gray-400 text-sm sm:text-base mb-4 sm:mb-6">Propiedades en Tepic, Nayarit</p>
+          <p className="text-gray-400 text-sm sm:text-base mb-4 sm:mb-6">Propiedades en Nayarit, Xalisco y Sinaloa</p>
           <p className="text-gray-500 text-xs sm:text-sm">&copy; 2026 Prisma Real Estate. Todos los derechos reservados.</p>
         </div>
       </footer>

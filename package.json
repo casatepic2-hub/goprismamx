@@ -1,7 +1,7 @@
 {
   "name": "prisma-real-estate",
   "version": "1.0.0",
-  "description": "Prisma Real Estate - Propiedades en Tepic, Nayarit",
+  "description": "Prisma Real Estate - Propiedades en Nayarit, Xalisco y Sinaloa",
   "private": true,
   "scripts": {
     "dev": "next dev -p 4299",
